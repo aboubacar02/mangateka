@@ -1,11 +1,68 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Apex Walls</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Walls Live</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass-effect { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .bottom-nav-active { color: #00f0ff; filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6)); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
 </head>
-<body class="bg-black text-white flex h-screen items-center justify-center">
-<h1 class="text-3xl font-black text-cyan-400 animate-pulse">APEX WALLS LIVE</h1>
+<body class="bg-[#0b0c10] text-white min-h-screen pb-24">
+
+    <header class="sticky top-0 z-40 glass-effect border-b border-white/5 px-6 py-4 flex items-center justify-between">
+        <h1 class="text-2xl font-black tracking-wider bg-gradient-to-r from-[#00f0ff] to-[#00a2ff] bg-clip-text text-transparent">APEX WALLS</h1>
+        <span class="px-4 py-1.5 bg-white/5 rounded-full text-xs font-bold text-[#00f0ff]">PREMIUM</span>
+    </header>
+
+    <main class="p-4 max-w-lg mx-auto">
+        <div id="home-tab" class="tab-content active">
+            <div class="grid grid-cols-2 gap-4" id="wallpaper-container"></div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 z-40 glass-effect border-t border-white/5 px-8 py-4 flex justify-around items-center">
+        <button class="flex flex-col items-center gap-1 bottom-nav-active">
+            <span class="text-xl">🏠</span>
+            <span class="text-[10px] font-medium">Accueil</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-white/40">
+            <span class="text-xl">⭐</span>
+            <span class="text-[10px] font-medium">Favoris</span>
+        </button>
+    </nav>
+
+    <script>
+        async function loadWallpapers() {
+            try {
+                const response = await fetch('catalogues.json');
+                const data = await response.json();
+                const container = document.getElementById('wallpaper-container');
+                
+                container.innerHTML = data.map(wp => {
+                    // Gère tous les formats de clés possibles (image, url, link, src)
+                    const imageSrc = wp.image || wp.url || wp.link || wp.src;
+                    const title = wp.titre || wp.title || wp.name || 'Voiture';
+                    
+                    return `
+                        <div class="group relative aspect-[9/16] rounded-2xl overflow-hidden border border-white/5">
+                            <img src="${imageSrc}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=500'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-3">
+                                <p class="text-xs font-semibold truncate w-full">${title}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error("Erreur:", error);
+            }
+        }
+        window.onload = loadWallpapers;
+    </script>
 </body>
 </html>
