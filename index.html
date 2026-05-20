@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Apex Walls - Premium</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script>
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { primary: '#00f0ff', surface: '#131313', 'surface-bright': '#3a3939', 'surface-container': '#212121', } } } }
+  </script>
+  <style>
+    body { font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .glass-effect { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .bottom-nav-active { color: #00f0ff; filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6)); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-surface text-white min-h-screen overflow-x-hidden">
+
+  <header class="fixed top-0 left-0 w-full z-40 glass-effect h-16 flex items-center justify-between px-6">
+    <h1 class="text-xl font-black italic tracking-tighter text-primary">APEX WALLS</h1>
+  </header>
+
+  <main class="pt-20 pb-28 px-4 max-w-md mx-auto">
+    <section id="accueil" class="tab-content active">
+      <h2 class="text-2xl font-bold mb-6">Latest Arrivals</h2>
+      <div id="grid-accueil" class="grid grid-cols-2 gap-4"></div>
+    </section>
+    
+    <section id="parcourir" class="tab-content">
+      <h2 class="text-3xl font-black mb-8 text-primary">Explorer</h2>
+    </section>
+  </main>
+
+  <nav class="fixed bottom-0 left-0 w-full glass-effect border-t border-white/5 px-4 pt-3 pb-8 z-40">
+    <div class="flex justify-around items-center max-w-md mx-auto">
+      <button onclick="switchTab('accueil', this)" class="bottom-nav-active transition-all"><span class="material-symbols-rounded">home</span></button>
+      <button onclick="switchTab('parcourir', this)" class="text-white/40 transition-all"><span class="material-symbols-rounded">grid_view</span></button>
+      <button onclick="switchTab('telechargements', this)" class="text-white/40 transition-all"><span class="material-symbols-rounded">download</span></button>
+      <button onclick="switchTab('paramtres', this)" class="text-white/40 transition-all"><span class="material-symbols-rounded">settings</span></button>
+    </div>
+  </nav>
+
+  <div id="previewModal" class="fixed inset-0 z-50 hidden opacity-0 transition-all duration-500 pointer-events-none">
+    <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl"></div>
+    <div class="relative h-full flex flex-col items-center p-6 justify-center">
+      <img id="previewImg" src="" class="w-full h-auto rounded-3xl">
+      <button onclick="closePreview()" class="mt-8 w-16 h-16 glass-effect rounded-full"><span class="material-symbols-rounded">close</span></button>
+    </div>
+  </div>
+
+  <script>
+    // Chargement auto depuis catalogues.json
+    async function loadData() {
+        try {
+            const res = await fetch('catalogues.json');
+            const data = await res.json();
+            const grid = document.getElementById('grid-accueil');
+            data.forEach(item => {
+                item.images.forEach(url => {
+                    const div = document.createElement('div');
+                    div.className = 'aspect-square rounded-2xl overflow-hidden glass-effect cursor-pointer';
+                    div.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+                    div.onclick = () => openPreview(url);
+                    grid.appendChild(div);
+                });
+            });
+        } catch(e) { console.log("En attente de catalogues.json"); }
+    }
+
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+    
+    function openPreview(url) {
+      document.getElementById('previewImg').src = url;
+      document.getElementById('previewModal').classList.remove('hidden', 'opacity-0');
+    }
+
+    function closePreview() {
+      document.getElementById('previewModal').classList.add('opacity-0');
+      setTimeout(() => document.getElementById('previewModal').classList.add('hidden'), 500);
+    }
+    
+    window.onload = loadData;
+  </script>
+</body>
+</html>
